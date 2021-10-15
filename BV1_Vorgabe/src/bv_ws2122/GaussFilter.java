@@ -75,12 +75,26 @@ public class GaussFilter {
 							dst.argb[pos] = 0xff000000;
 						} else {
 							int newvalue = 0;
+							int rn = 0;
+							int gn = 0;
+							int bn = 0;
 							//durch den Kernel loopen
 							for(int k = -hotspot; k <= hotspot; k++) {
 								for(int l = -hotspot; l <= hotspot; l++) {
-									newvalue = (int) (newvalue + src.argb[(x + k) + (y+l) * src.width] * kernel[k+hotspot][l+hotspot]);
+									//newvalue = (int) (newvalue + src.argb[(x + k) + (y+l) * src.width] * kernel[k+hotspot][l+hotspot]);
+									int argb = src.argb[(x + k) + (y+l) * src.width];
+									int r = (argb >> 16) & 0xff;
+									int g = (argb >>  8) & 0xff;
+									int b =  argb & 0xff; 
+									
+									rn = (int) (rn + r * kernel[k+hotspot][l+hotspot]);
+									gn = (int) (gn + g * kernel[k+hotspot][l+hotspot]);
+									bn = (int) (bn + b * kernel[k+hotspot][l+hotspot]);
 								}
 							}
+							//grayscale
+							newvalue = (rn+gn+bn)/3;
+							
 							//in das neue Bild einsetzen
 							dst.argb[pos] = (0xff<<24) | (newvalue << 16) | (newvalue << 8) | newvalue;
 							
