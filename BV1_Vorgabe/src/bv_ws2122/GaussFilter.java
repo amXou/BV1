@@ -46,36 +46,49 @@ public class GaussFilter {
 		// Step 4: Apply the filter given by "kernel" to the source image "src". The result goes to image "dst".
 		// Use "constant continuation" for boundary processing.
 		
-		for(int posx = 0; posx < src.width; posx ++) {
-			for(int posy = 0; posy < src.height; posy ++) {
-				int pos = posy * src.width + posx;
-				int gray; // = src.argb[pos] & 0xff;
-				if(!(posx < hotspot && posx > src.width - hotspot 
-				   && posy < hotspot && posy > src.height - hotspot)) {
-					double newvalue = 0;
-					for(int k = - hotspot; k < hotspot; k++) {
-						for(int l = - hotspot; l < hotspot; l++) {
-							newvalue = newvalue + src.argb[(posx + k) + (posy + l) * src.width] * kernel[k+hotspot][l+hotspot];
+//		for(int posx = 0; posx < src.width; posx ++) {
+//			for(int posy = 0; posy < src.height; posy ++) {
+//				int pos = posy * src.width + posx;
+//				int gray; // = src.argb[pos] & 0xff;
+//				if(!(posx < hotspot && posx > src.width - hotspot 
+//				   && posy < hotspot && posy > src.height - hotspot)) {
+//					double newvalue = 0;
+//					for(int k = - hotspot; k < hotspot; k++) {
+//						for(int l = - hotspot; l < hotspot; l++) {
+//							newvalue = newvalue + src.argb[(posx + k) + (posy + l) * src.width] * kernel[k+hotspot][l+hotspot];
+//						}
+//					}
+//					gray = (int) newvalue;
+//					dst.argb[pos] = 0xff000000 | gray << 16 | gray << 8 | gray;
+//				} else {
+//					dst.argb[pos] = 0xff000000; // | r << 16 | g << 8 | b;
+//				}
+//			}
+//		} 
+		//durch das src-Bild loopen
+				for(int x = 0; x < src.width; x++) {
+					for(int y = 0; y < src.height; y++) {
+						int pos = y * src.width + x;
+						if(x < hotspot || x >= src.width - hotspot
+								|| y < hotspot || y >= src.height - hotspot) {
+							//Rand zunächst auf scharz setzen
+							dst.argb[pos] = 0xff000000;
+						} else {
+							int newvalue = 0;
+							//durch den Kernel loopen
+							for(int k = -hotspot; k <= hotspot; k++) {
+								for(int l = -hotspot; l <= hotspot; l++) {
+									newvalue = (int) (newvalue + src.argb[(x + k) + (y+l) * src.width] * kernel[k+hotspot][l+hotspot]);
+								}
+							}
+							//in das neue Bild einsetzen
+							dst.argb[pos] = (0xff<<24) | (newvalue << 16) | (newvalue << 8) | newvalue;
+							
 						}
 					}
-					gray = (int) newvalue;
-					dst.argb[pos] = 0xff000000 | gray << 16 | gray << 8 | gray;
-				} else {
-					dst.argb[pos] = 0xff000000; // | r << 16 | g << 8 | b;
 				}
-			}
-		} 
 	}
-		/*for(int pos = 0; pos < src.argb.length; pos++) {
-			int r = src.argb[pos] >> 16 & 0xff;
-			int g = src.argb[pos] >> 8 & 0xff;
-			int b = src.argb[pos] & 0xff;
-			
-			
-			
-			dst.argb[pos] = 0xff000000 | r << 16 | g << 8 | b;
-	}
-		  */ 		     	
+		     	
 
 }
  		   		     	
